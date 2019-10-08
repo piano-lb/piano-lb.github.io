@@ -38,7 +38,7 @@
     "example/**/*"
   ],
   "engines": {
-    "node": "^12.8.0"
+    "node": "^11.14.0"
   },
   "dependencies": {
     "accessor-fn": "^1.2.2",
