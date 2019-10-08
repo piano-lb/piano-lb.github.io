@@ -1,0 +1,182 @@
+<head>
+  
+    <!-- <script crossorigin src="https://unpkg.com/3d-force-graph@1.55.2/dist/3d-force-graph.min.js"></script> -->
+    <!-- <script src="https://unpkg.com/d3-octree@0.1.4/dist/d3-octree.min.js"></script> -->
+    <!-- <script src="https://unpkg.com/d3-force-3d@2.0.3/dist/d3-force-x3d.min.js"></script> -->
+    <!-- <script src="https://unpkg.com/three@0.109.0/build/three.js"></script> -->
+
+    <script src="//unpkg.com/three"></script>
+    <script src="//unpkg.com/d3-octree"></script>
+    <script src="//unpkg.com/d3-force-3d"></script>
+    <script src="../dist/3d-force-graph.js"></script>
+  </head>
+  
+  <body>
+    <div class="overlay">
+      <div class="nav">
+        <img src="./Title.png" width="260px" height="50px"/>
+        <img src="./Actions.png" width="250px" height="31px"/>
+      </div>
+      <div class="tools">
+        <img src="./View.png" width="80px" height="30px"/>
+        <img src="./Scale.png" width="46px" height="12px"/>
+        <img src="./Viewport.png" width="260px" height="30px"/>
+      </div>
+    </div>
+    <div id="3d-graph"></div>
+
+  
+    <script>
+  
+      let elem = document.getElementById('3d-graph');
+      const N = 20;
+      const nodes = [...Array(N).keys()].map(() => ({
+        // Initial velocity in random direction
+        vx: Math.random(),
+        vy: Math.random(),
+        vz: Math.random(),
+        id: N,
+        data: 'x'
+      }));
+
+      let nodeClicked = false;
+  
+  
+      var geometry = new THREE.SphereBufferGeometry( 1.5, 32, 32 );
+      var material = new THREE.MeshBasicMaterial( { color: 0x0a0e12, opacity: 0.4, transparent: true } );
+      var mesh = new THREE.Mesh( geometry, material );
+  
+      const Graph = ForceGraph3D()
+        (elem);
+      Graph.cooldownTime(Infinity)
+        // .d3AlphaDecay(0)
+        // .d3VelocityDecay(0)
+        // // Deactivate existing forces
+        .d3Force('center', null)
+        .d3Force('charge', null)
+        // // Add collision and bounding box forces
+        // .d3Force('collide', d3.forceCollide(Graph.nodeRelSize()))
+        // .d3Force('box', () => {
+        //   const CUBE_HALF_SIDE = Graph.nodeRelSize() * N * 0.5;
+        //   nodes.forEach(node => {
+        //     const x = node.x || 0, y = node.y || 0, z = node.z || 0;
+        //     // bounce on box walls
+        //     if (Math.abs(x) > CUBE_HALF_SIDE) { node.vx *= -1; }
+        //     if (Math.abs(y) > CUBE_HALF_SIDE) { node.vy *= -1; }
+        //     if (Math.abs(z) > CUBE_HALF_SIDE) { node.vz *= -1; }
+        //   });
+        // })
+        .nodeThreeObject(({ id }) => new THREE.Mesh( geometry, material ))
+        // Add nodes
+        .graphData({ nodes, links: [] })
+        .backgroundColor('#f3f4f5')
+        // .nodeLabel(node => 'User / John Smith')
+        .onNodeHover(node => {
+          elem.style.cursor = node ? 'pointer' : null;
+          console.log("HOVER CLICKED? ", nodeClicked);
+          if (!nodeClicked) {
+            if (node) {
+              console.log('1 hover node, no click')
+              Graph.nodeLabel(node => 'User / John Smith');
+            }
+            else {
+              console.log('2 hover null, no click')
+              Graph.nodeLabel(node => '<img src="./Tooltip.png" width="363px" height="370px"/>');
+            }
+
+          } else {
+            if (node) {
+              console.log('3 hover node, yes click')
+              Graph.nodeLabel(node => '<img src="./Tooltip.png" width="363px" height="370px"/>');
+            } else {
+              console.log('4 hover null, yes click');
+              Graph.nodeLabel(node => '<img src="./Tooltip.png" width="363px" height="370px"/>');
+            }
+          }
+        })
+        .onNodeClick(node => {
+          console.log('node clicked?', nodeClicked)
+          if(!nodeClicked && node) {
+            // Aim at node from outside it
+            const distance = 40;
+            const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+            // console.log(Graph.cameraPosition().x.toString())
+            Graph.cameraPosition(
+              { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
+              node, // lookAt ({ x, y, z })
+              3000  // ms transition duration
+            );
+            // node.Label = '<img src="./Tooltip.png" width="260px" height="30px"/>';
+            // console.log(Graph.cameraPosition().x.toString())
+            Graph.nodeLabel(node => '<img src="./Tooltip.png" width="363px" height="370px"/>');
+            nodeClicked = true;
+            console.log('click in')
+          } else {
+            console.log('click out')
+            nodeClicked = false;
+            // Graph.nodeLabel(node => '<img src="./Tooltip.png" width="363px" height="370px"/>');
+          }
+        })
+        .showNavInfo(false);
+      window.scene = Graph.scene();
+      window.THREE = THREE;
+    </script>
+  </body>
+  
+  <style> 
+      body { 
+        margin: 0;
+        overflow: hidden;
+      }
+      .scene-tooltip { 
+        color: #0a0e12;
+        font-size: 9px;
+        font-family: 'Graphik';
+      }
+      #3d-graph {
+        position: absolute;
+        z-index: 1;
+      }
+      .overlay {
+        position: absolute;
+        pointer-events: none;
+        z-index: 2;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+      }
+      .overlay .nav {
+        top: 0;
+        left: 0;
+        width: calc(100% - 10px);
+        margin-right: 10px;
+        box-sizing: border-box;
+        position: absolute;
+        display: inline-flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .overlay .tools {
+        bottom: 0;
+        left: 0;
+        height: 30px;
+        width: calc(100% - 20px);
+        margin: 10px;
+        box-sizing: border-box;
+        position: absolute;
+      }
+      .overlay .tools :nth-child(1) {
+        position: absolute;
+        left: 0px;
+      }
+      .overlay .tools :nth-child(2) {
+        position: absolute;
+        top: 10px;
+        left: calc(50% - 23px);
+      }
+      .overlay .tools :nth-child(3) {
+        position: absolute;
+        right: 0px;
+      }
+  </style>

@@ -224,4 +224,8 @@ ForceGraph3d({ configOptions })(<domElement>)
 [build-size-img]: https://img.shields.io/bundlephobia/minzip/3d-force-graph.svg
 [build-size-url]: https://bundlephobia.com/result?p=3d-force-graph
 [dependencies-img]: https://img.shields.io/david/vasturiano/3d-force-graph.svg
+<<<<<<< HEAD
 [dependencies-url]: https://david-dm.org/vasturiano/3d-force-graph -->
+=======
+[dependencies-url]: https://david-dm.org/vasturiano/3d-force-graph
+>>>>>>> 92288bc835419bd9333481dd7d2d1c7c325338e3
