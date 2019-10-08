@@ -37,6 +37,9 @@
     "dist/**/*",
     "example/**/*"
   ],
+  "engines": {
+    "node": "^12.8.0"
+  },
   "dependencies": {
     "accessor-fn": "^1.2.2",
     "kapsule": "^1.12.1",
