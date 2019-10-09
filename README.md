@@ -1,4 +1,4 @@
-[Audience discovery](https://piano-lb.github.io/example/audience-discovery/) ([source](https://github.com/piano-lb/example/audience-discovery/index.html))
+[Audience discovery](https://piano-lb.github.io/example/audience-discovery/) ([source](https://github.com/piano-lb/piano-lb.github.io/blob/master/src/index.html))
 
 <!-- 3D Force-Directed Graph
 =======================
